@@ -110,9 +110,9 @@ fer2013/
 
 ## 👨‍💻 Team
 
-- **Anandhu M S**  
-- **Hemendra Patel**  
-- **Bhati Akshraj Sinh**
+- **Heril Patel**  
+- **Krish Prajapti**  
+- **Abhay Vishwakarma**
 
 ---
 
