@@ -1,44 +1,5 @@
-from flask import Flask, render_template_string, jsonify, request
-import cv2
-from deepface import DeepFace
 
-app = Flask(__name__)
 
-# Mood to Playlist mapping
-emotion_to_playlist = {
-    'happy': 'https://open.spotify.com/playlist/37i9dQZF1DXdPec7aLTmlC',
-    'sad': 'https://open.spotify.com/playlist/37i9dQZF1DX7qK8ma5wgG1',
-    'angry': 'https://open.spotify.com/playlist/37i9dQZF1DWYxwmBaMqxsl',
-    'surprise': 'https://open.spotify.com/playlist/37i9dQZF1DWTfrr8pte1rT',
-    'fear': 'https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO',
-    'disgust': 'https://open.spotify.com/playlist/37i9dQZF1DX7gtIfGVzmkY',
-    'neutral': 'https://open.spotify.com/playlist/37i9dQZF1DX4WYpdgoIcn6'
-}
-
-# Better face detection
-def detect_emotion():
-    cap = cv2.VideoCapture(0)
-    ret, frame = cap.read()
-    cap.release()
-
-    if not ret:
-        return "neutral"
-    
-    try:
-        # Enhanced face detection with 'mtcnn' or 'dlib'
-        analysis = DeepFace.analyze(frame, actions=['emotion'], enforce_detection=True, detector_backend='mtcnn')
-        if isinstance(analysis, list) and len(analysis) > 0:
-            emotion = analysis[0].get('dominant_emotion', 'neutral')
-        else:
-            emotion = 'neutral'
-        return emotion
-    except Exception as e:
-        print(f"[ERROR] Emotion detection failed: {e}")
-        return "neutral"
-
-@app.route('/')
-def index():
-    html = '''
     <!DOCTYPE html>
     <html>
     <head>
@@ -250,22 +211,4 @@ def index():
         </script>
     </body>
     </html>
-    '''
-    return render_template_string(html)
-
-@app.route('/get_playlist', methods=['GET'])
-def get_playlist():
-    emotion = detect_emotion()
-    playlist_url = emotion_to_playlist.get(emotion, emotion_to_playlist['neutral'])
-    return jsonify({'emotion': emotion, 'playlist': playlist_url})
-
-@app.route('/get_playlist_by_mood', methods=['GET'])
-def get_playlist_by_mood():
-    mood = request.args.get('mood', '').lower()
-    if mood not in emotion_to_playlist:
-        mood = 'neutral'
-    playlist_url = emotion_to_playlist[mood]
-    return jsonify({'emotion': mood, 'playlist': playlist_url})
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    
